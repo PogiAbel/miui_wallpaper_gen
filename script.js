@@ -1,5 +1,6 @@
-let uploadedImages = [];
-
+var uploadedImages = [];
+var corpImageList = [];
+var concatenatedImage = null;
 // Function to display uploaded images as thumbnails with minimized size
 function displayUploadedImages() {
     const uploadedImagesContainer = document.getElementById('uploadedImagesContainer');
@@ -42,37 +43,31 @@ imageInput.addEventListener('change', () => {
     imageInput.value = '';
 });
 
-async function concatImages() {
+let minifiedImg;
+
+async function concatImages(imageLsit) {
     const concatenatedImageContainer = document.getElementById('concatenatedImageContainer');
     const downloadLink = document.getElementById('downloadLink');
-    const imageDimensionsContainer = document.getElementById('imageDimensionsContainer');
     const resContainer = document.getElementById('res');
 
-    if (uploadedImages.length === 0) {
+    if (imageLsit.length === 0) {
         alert('Please upload at least one image.');
         return;
     }
 
-    // Check if the "Same Width/Height" checkbox is checked
-    const sameSizeCheckbox = document.getElementById('sameSizeCheckbox');
-    const shouldEnforceSameSize = sameSizeCheckbox.checked;
-
     // Calculate the dimensions based on the first image
     const firstImage = new Image();
-    firstImage.src = uploadedImages[0];
+    firstImage.src = imageLsit[0];
     await new Promise((resolve) => (firstImage.onload = resolve));
-    const imageWidth = firstImage.width;
-    const imageHeight = firstImage.height;
 
-    // Concatenate the original images
+    // Concatenate the original images without resizing
     const canvasConcatenated = document.createElement('canvas');
     const ctxConcatenated = canvasConcatenated.getContext('2d');
 
     let totalWidth = 0;
     let maxHeight = 0;
-    let scaleRatio = 1; // Initialize scaleRatio
 
-    for (const imageUrl of uploadedImages) {
+    for (const imageUrl of imageLsit) {
         const img = new Image();
         img.src = imageUrl;
         await new Promise((resolve) => (img.onload = resolve));
@@ -81,100 +76,39 @@ async function concatImages() {
         maxHeight = Math.max(maxHeight, img.height);
     }
 
-    // Calculate the maximum width to fit within the window
-    const maxWidth = window.innerWidth - 20; // Subtract some margin for better display
-
-    // Scale the concatenated image if it exceeds the maximum width
-    if (totalWidth > maxWidth) {
-        scaleRatio = maxWidth / totalWidth; // Update scaleRatio
-        totalWidth = maxWidth;
-        maxHeight *= scaleRatio;
-    }
-
     canvasConcatenated.width = totalWidth;
     canvasConcatenated.height = maxHeight;
 
     let xOffset = 0;
 
-    for (const imageUrl of uploadedImages) {
+    for (const imageUrl of imageLsit) {
         const img = new Image();
         img.src = imageUrl;
         await new Promise((resolve) => (img.onload = resolve));
 
-        ctxConcatenated.drawImage(img, xOffset, 0, img.width * scaleRatio, img.height * scaleRatio);
-        xOffset += img.width * scaleRatio;
+        ctxConcatenated.drawImage(img, xOffset, 0);
+        xOffset += img.width;
     }
 
-    // Display the minified version of the concatenated image
-    const minifiedImageUrl = canvasConcatenated.toDataURL('image/png');
+    // Save the original concatenated image in the variable
+    concatenatedImage = new Image();
+    concatenatedImage.src = canvasConcatenated.toDataURL('image/png');
+    concatenatedImage.style.width = '70%';
 
-    const concatenatedImage = new Image();
-    concatenatedImage.src = minifiedImageUrl;
-    concatenatedImage.alt = 'Concatenated Image';
-
+    // Display the original concatenated image
     concatenatedImage.onload = () => {
-        concatenatedImage.style.maxWidth = '100%'; // Ensure it doesn't exceed the window width
-        concatenatedImage.style.height = 'auto';
         concatenatedImageContainer.innerHTML = '';
         concatenatedImageContainer.appendChild(concatenatedImage);
 
-        // Provide a download link for the original-sized image in PNG format
-        downloadLink.href = canvasConcatenated.toDataURL('image/png');
-        downloadLink.download = 'concatenated.png';
-        downloadLink.style.display = 'block';
-
-    };
-
-    concatenatedImage.onload = () => {
-        concatenatedImage.style.maxWidth = '100%';
-        concatenatedImage.style.height = 'auto';
-        concatenatedImageContainer.innerHTML = '';
-        concatenatedImageContainer.appendChild(concatenatedImage);
-
-        // Display the download link
+        // Display the download link for the original image
         downloadLink.href = canvasConcatenated.toDataURL('image/png');
         downloadLink.style.display = 'block';
 
-        // Display the resolution of the concatenated image
-        const concatenatedImageWidth = canvasConcatenated.width;
-        const concatenatedImageHeight = canvasConcatenated.height;
-        resContainer.textContent = `Concatenated Image Resolution: ${concatenatedImageWidth}x${concatenatedImageHeight}`;
-
-        // Display image names with dimensions and error style if necessary
-        if (shouldEnforceSameSize) {
-            const imageInfo = uploadedImages.map((imageUrl, index) => {
-                const img = new Image();
-                img.src = imageUrl;
-                const width = img.width;
-                const height = img.height;
-                const isSameSize = width === imageWidth && height === imageHeight;
-
-                // Define a CSS class for the error style
-                const errorClass = isSameSize ? '' : 'error';
-
-                return {
-                    name: `Image ${index + 1}`,
-                    width,
-                    height,
-                    errorClass, // Include the error class
-                };
-            });
-
-            imageDimensionsContainer.style.display = 'block';
-
-            // Generate HTML for image names with error styles
-            const imageInfoHTML = imageInfo.map(
-                (info) =>
-                    `<div class="image-info ${info.errorClass}">${info.name}: ${info.width}x${info.height}</div>`
-            ).join('');
-
-            imageDimensionsContainer.innerHTML = imageInfoHTML;
-        } else {
-            imageDimensionsContainer.style.display = 'none';
-        }
+        // Display the resolution of the original images' width and height
+        resContainer.textContent = `Original Images Resolution: ${totalWidth}x${maxHeight}`;
     };
+
 }
-
 
 // Clear uploaded images
 function clearImages() {
@@ -187,7 +121,7 @@ function clearImages() {
 }
 
 // JavaScript code for the "Calculate Resolutions" page
-let widthMultiplier = 1;
+var widthMultiplier = 1;
 
 function updateCalculatedResolution() {
     const baseWidth = 1080;
@@ -207,4 +141,61 @@ function decreaseWidth() {
     if(widthMultiplier > 1) widthMultiplier--;
     document.getElementById('widthMultiplier').textContent = widthMultiplier;
     updateCalculatedResolution();
+}
+
+function resizeOrCropImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+
+        img.onload = function () {
+            // Create a canvas element with the target dimensions
+            const canvas = document.createElement('canvas');
+            canvas.width = 1080;
+            canvas.height = 2400;
+
+            // Get the 2D drawing context of the canvas
+            const ctx = canvas.getContext('2d');
+
+            // Calculate the scaling factors for resizing the image to fit the canvas
+            const scaleX = canvas.width / img.width;
+            const scaleY = canvas.height / img.height;
+
+            // Choose the appropriate scaling factor to fill the entire canvas without leaving any blank spaces
+            const scale = Math.max(scaleX, scaleY);
+
+            // Calculate the new dimensions for the scaled image
+            const newWidth = img.width * scale;
+            const newHeight = img.height * scale;
+
+            // Calculate the position to center the scaled image on the canvas
+            const x = (canvas.width - newWidth) / 2;
+            const y = (canvas.height - newHeight) / 2;
+
+            // Clear the canvas and draw the scaled and centered image
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, x, y, newWidth, newHeight);
+
+            // Create a new image element with the cropped or resized data URL
+            const croppedOrResizedImg = new Image();
+            croppedOrResizedImg.src = canvas.toDataURL();
+
+            resolve(croppedOrResizedImg);
+        };
+
+        img.onerror = function () {
+            reject(new Error(`Failed to load image: ${src}`));
+        };
+
+        img.src = src;
+    });
+}
+
+async function cropImages() {
+    for(const image of uploadedImages) {
+        const croppedImage = await resizeOrCropImage(image);
+        corpImageList.push(croppedImage.src);
+    }
+    console.log('corpImageList', corpImageList);
+    concatImages(corpImageList);
+    corpImageList = [];
 }

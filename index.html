@@ -40,28 +40,29 @@
     <h1>Image Concatenation</h1>
     <div class="container">
         <input type="file" id="imageInput" accept=".png" multiple>
-        <label for="sameSizeCheckbox">Same Width/Height:</label>
-        <input type="checkbox" id="sameSizeCheckbox">
-        <button onclick="concatImages()">Concatenate Images</button>
+        <button onclick="concatImages(uploadedImages)">Concatenate Images</button>
         <button onclick="clearImages()">Clear Images</button>
+        <button onclick="cropImages()">Crop Image</button>
     </div>
     <div class="container">
         <a id="downloadLink" style="display: none" download="concatenated.png">Download Concatenated Image</a>
+        <div class="container" id="uploadedImagesContainer"></div>
+        <h1 id="res" class="container"></h1>
+        <h1 id="imageDimensionsContainer"></h1>
+        <div class="container" id="concatenatedImageContainer"></div>
+        <h1 id="resCorp"></h1>
+        <div id="croppedImageContainer"></div>
     </div>
-    <div class="container" id="uploadedImagesContainer"></div>
-    <h1 id="res" class="container"></h1>
-    <div class="container" id="concatenatedImageContainer"></div>
-    <div class="container" id="imageDimensionsContainer" style="display: none;"></div>
-    <script src="script.js"></script>
     <hr>
-    </div>
-    <div id="calculate" class="container">
-        <h2>Calculate Resolutions</h2>
-        <p>Base Resolution: 1080x2400</p>
-        <p>Width Multiplier: <span id="widthMultiplier">1</span></p>
-        <p>Calculated Resolution: <span id="calculatedResolution">1080x2400</span></p>
-        <button onclick="increaseWidth()">Increase Width</button>
-        <button onclick="decreaseWidth()">Decrease Width</button>
-    </div>
+</div>
+<div id="calculate" class="container">
+    <h2>Calculate Resolutions</h2>
+    <p>Base Resolution: 1080x2400</p>
+    <p>Width Multiplier: <span id="widthMultiplier">1</span></p>
+    <p>Calculated Resolution: <span id="calculatedResolution">1080x2400</span></p>
+    <button onclick="increaseWidth()">Increase Width</button>
+    <button onclick="decreaseWidth()">Decrease Width</button>
+</div>
+<script src="script.js"></script>
 </body>
 </html>
