@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Concatenation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            text-align: center;
+        }
+        .thumbnail {
+            max-width: 100px;
+            max-height: 100px;
+            margin: 5px;
+        }
+        #concatenatedImage {
+            max-width: 100%;
+            height: auto;
+        }
+        .error {
+            color: red; /* Red text color for error */
+            font-weight: bold; /* Bold text for error */
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Concatenation</h1>
+    <div class="container">
+        <input type="file" id="imageInput" accept=".png" multiple>
+        <label for="sameSizeCheckbox">Same Width/Height:</label>
+        <input type="checkbox" id="sameSizeCheckbox">
+        <button onclick="concatImages()">Concatenate Images</button>
+        <button onclick="clearImages()">Clear Images</button>
+    </div>
+    <div class="container">
+        <a id="downloadLink" style="display: none" download="concatenated.png">Download Concatenated Image</a>
+    </div>
+    <div class="container" id="uploadedImagesContainer"></div>
+    <div class="container" id="concatenatedImageContainer"></div>
+    <div class="container" id="imageDimensionsContainer" style="display: none;"></div>
+    <script src="script.js"></script>
+</body>
+</html>
