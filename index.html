@@ -30,6 +30,13 @@
     </style>
 </head>
 <body>
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#calculate">Calculate Resolutions</a></li>
+        </ul>
+    </nav>
+    <div id="home">
     <h1>Image Concatenation</h1>
     <div class="container">
         <input type="file" id="imageInput" accept=".png" multiple>
@@ -42,8 +49,19 @@
         <a id="downloadLink" style="display: none" download="concatenated.png">Download Concatenated Image</a>
     </div>
     <div class="container" id="uploadedImagesContainer"></div>
+    <h1 id="res" class="container"></h1>
     <div class="container" id="concatenatedImageContainer"></div>
     <div class="container" id="imageDimensionsContainer" style="display: none;"></div>
     <script src="script.js"></script>
+    <hr>
+    </div>
+    <div id="calculate" class="container">
+        <h2>Calculate Resolutions</h2>
+        <p>Base Resolution: 1080x2400</p>
+        <p>Width Multiplier: <span id="widthMultiplier">1</span></p>
+        <p>Calculated Resolution: <span id="calculatedResolution">1080x2400</span></p>
+        <button onclick="increaseWidth()">Increase Width</button>
+        <button onclick="decreaseWidth()">Decrease Width</button>
+    </div>
 </body>
 </html>

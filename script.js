@@ -46,6 +46,7 @@ async function concatImages() {
     const concatenatedImageContainer = document.getElementById('concatenatedImageContainer');
     const downloadLink = document.getElementById('downloadLink');
     const imageDimensionsContainer = document.getElementById('imageDimensionsContainer');
+    const resContainer = document.getElementById('res');
 
     if (uploadedImages.length === 0) {
         alert('Please upload at least one image.');
@@ -121,6 +122,7 @@ async function concatImages() {
         downloadLink.href = canvasConcatenated.toDataURL('image/png');
         downloadLink.download = 'concatenated.png';
         downloadLink.style.display = 'block';
+
     };
 
     concatenatedImage.onload = () => {
@@ -132,6 +134,11 @@ async function concatImages() {
         // Display the download link
         downloadLink.href = canvasConcatenated.toDataURL('image/png');
         downloadLink.style.display = 'block';
+
+        // Display the resolution of the concatenated image
+        const concatenatedImageWidth = canvasConcatenated.width;
+        const concatenatedImageHeight = canvasConcatenated.height;
+        resContainer.textContent = `Concatenated Image Resolution: ${concatenatedImageWidth}x${concatenatedImageHeight}`;
 
         // Display image names with dimensions and error style if necessary
         if (shouldEnforceSameSize) {
@@ -177,4 +184,27 @@ function clearImages() {
     const concatenatedImageContainer = document.getElementById('concatenatedImageContainer');
     concatenatedImageContainer.innerHTML = '';
     downloadLink.style.display = 'none';
+}
+
+// JavaScript code for the "Calculate Resolutions" page
+let widthMultiplier = 1;
+
+function updateCalculatedResolution() {
+    const baseWidth = 1080;
+    const baseHeight = 2400;
+    const calculatedWidth = baseWidth * widthMultiplier;
+    const calculatedHeight = baseHeight;
+
+    document.getElementById('calculatedResolution').textContent = `${calculatedWidth}x${calculatedHeight}`;
+}
+
+function increaseWidth() {
+    widthMultiplier++;
+    document.getElementById('widthMultiplier').textContent = widthMultiplier;
+    updateCalculatedResolution();
+}
+function decreaseWidth() {
+    if(widthMultiplier > 1) widthMultiplier--;
+    document.getElementById('widthMultiplier').textContent = widthMultiplier;
+    updateCalculatedResolution();
 }
